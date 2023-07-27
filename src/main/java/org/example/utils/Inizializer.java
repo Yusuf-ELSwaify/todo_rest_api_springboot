@@ -17,7 +17,7 @@ public class Inizializer implements CommandLineRunner{
 	AuthorizedUserService userService;
 	@Override
 	public void run(String... args) throws Exception {
-		if (userService.findAll().isEmpty())
+		if (userService.usersCount() == 0)
 		{
 			System.out.println("No user found");
 			AppUser u1 = new AppUser();

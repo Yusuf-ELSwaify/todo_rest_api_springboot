@@ -33,4 +33,7 @@ public class AuthorizedUserService implements UserDetailsService {
 	public List<AppUser> findAll() {
 		return repository.findAll();
 	}
+	public long usersCount() {
+		return repository.count();
+	}
 }

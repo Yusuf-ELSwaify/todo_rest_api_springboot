@@ -18,16 +18,17 @@ public class AppUser implements UserDetails {
 	String username;
 	@JsonIgnore
 	String password;
-	Date created;
+	@Temporal(TemporalType.DATE)
+	Date creationDate;
 	@ElementCollection(fetch = FetchType.EAGER)
 	private List<String> authorities = new ArrayList<>();
 	public AppUser(String username, String password) {
 		this.username = username;
 		this.password = password;
-		this.created = new Date();
+		this.creationDate = new Date();
 	}
 	public AppUser() {
-		this.created = new Date();
+		this.creationDate = new Date();
 	}
 	public int getId() {
 		return id;
@@ -44,13 +45,15 @@ public class AppUser implements UserDetails {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public Date getCreated() {
-		return created;
+
+	public Date getCreationDate() {
+		return creationDate;
 	}
 
-	public void setCreated(Date created) {
-		this.created = created;
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
 	}
+
 	public void setAuthorities(List<String> authorities) {
 		this.authorities = authorities;
 	}
