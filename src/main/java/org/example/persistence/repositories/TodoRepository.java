@@ -1,6 +1,6 @@
-package org.example.presistence.repositories;
+package org.example.persistence.repositories;
 
-import org.example.presistence.models.Todo;
+import org.example.persistence.models.Todo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
