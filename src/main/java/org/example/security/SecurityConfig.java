@@ -27,30 +27,30 @@ public class SecurityConfig{
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 		//return new BCryptPasswordEncoder(20);
 	}*/
-	@Bean
-	public UserDetailsService userDetailsService() {
-		UserDetails userDetails = User.builder()
-				.username("yusuf")
-				.password("{noop}pass")
-				.roles("USER")
-				.build();
-		UserDetails userDetails2 = User.builder()
-				.username("yusuf2")
-				.password("{noop}pass2")
-				.roles("USER2")
-				.build();
-		return new InMemoryUserDetailsManager(userDetails, userDetails2);
-	}
+//	@Bean
+//	public UserDetailsService userDetailsService() {
+//		UserDetails userDetails = User.builder()
+//				.username("yusuf")
+//				.password("{noop}pass")
+//				.roles("USER")
+//				.build();
+//		UserDetails userDetails2 = User.builder()
+//				.username("yusuf2")
+//				.password("{noop}pass2")
+//				.roles("USER2")
+//				.build();
+//		return new InMemoryUserDetailsManager(userDetails, userDetails2);
+//	}
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 		return http.authorizeHttpRequests(auth -> {
 					auth.requestMatchers( HttpMethod.DELETE, "/api/v1/todos/*")
-							.hasAnyRole("USER2");
+							.hasAuthority("USER2");
 					auth.requestMatchers( HttpMethod.POST, "/api/v1/todos/*")
-							.hasAnyRole("USER");
+							.hasAuthority("USER");
 					auth.requestMatchers( HttpMethod.GET, "/api/v1/todos/1")
-							.hasAnyRole("USER");
+							.hasAuthority("USER");
 					auth.requestMatchers( HttpMethod.GET, "/api/v1/todos/*")
 							.permitAll();
 /*					auth.requestMatchers(  "/**")
