@@ -1,4 +1,4 @@
-package org.example.handlers;
+package org.example.utils.handlers;
 
 import org.example.errors.ValidationError;
 import org.example.exceptions.ApiBaseException;

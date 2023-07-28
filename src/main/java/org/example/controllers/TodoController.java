@@ -1,6 +1,8 @@
 package org.example.controllers;
 
 import jakarta.validation.Valid;
+import org.example.services.dtos.TodoResponseDto;
+import org.example.services.dtos.TodoRequestDto;
 import org.example.persistence.models.Todo;
 import org.example.services.TodoService;
 import org.springframework.http.HttpStatus;
@@ -12,34 +14,35 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/todos")
 public class TodoController {
-	final TodoService service;
+	final TodoService todoService;
 
-	public TodoController(TodoService service) {
-		this.service = service;
+	public TodoController(TodoService todoService) {
+		this.todoService = todoService;
 	}
 
-	@RequestMapping({"", "/"})
-	public ResponseEntity<List<Todo>> getAll() {
-		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
+	@GetMapping({"", "/"})
+	public ResponseEntity<List<TodoResponseDto>> getAll() {
+		return new ResponseEntity<>(todoService.findAll(),
+				HttpStatus.OK);
 	}
-	@RequestMapping({"/{id}"})
-	public ResponseEntity<Todo> get(@PathVariable int id) {
-		Todo todo = service.find(id);
-		if (todo == null)
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+
+	@GetMapping({"/{id}"})
+	public ResponseEntity<TodoResponseDto> get(@PathVariable int id) {
+		TodoResponseDto todo = todoService.find(id);
 		return new ResponseEntity<>(todo, HttpStatus.OK);
 	}
 	@PostMapping({"/"})
-	public ResponseEntity<Todo> add(@Valid @RequestBody Todo todo) {
-		if (service.add(todo) != null)
-			return new ResponseEntity<>(todo, HttpStatus.CREATED);
+	public ResponseEntity<TodoResponseDto> add(@Valid @RequestBody TodoRequestDto todoRequestDto) {
+		TodoResponseDto todoResponseDto = todoService.add(todoRequestDto);
+		if (todoResponseDto != null)
+			return new ResponseEntity<>(todoResponseDto, HttpStatus.CREATED);
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable int id) {
-		boolean deleted = service.delete(id);
-		if (!deleted)
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		todoService.delete(id);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 }

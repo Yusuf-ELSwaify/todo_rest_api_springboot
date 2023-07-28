@@ -1,4 +1,4 @@
-package org.example.security;
+package org.example.configurations;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,17 +11,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableWebSecurity
 @Configuration
@@ -51,19 +42,14 @@ public class SecurityConfig{
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 		return http.authorizeHttpRequests(auth -> {
-					auth.requestMatchers( HttpMethod.DELETE, "/api/v1/todos/*")
-							.hasAuthority("USER2");
-					auth.requestMatchers( HttpMethod.POST, "/api/v1/todos/")
-							.hasAuthority("USER");
-					auth.requestMatchers( HttpMethod.GET, "/api/v1/todos/1")
-							.hasAuthority("USER");
-					auth.requestMatchers( HttpMethod.POST, "/api/v1/**")
-							.permitAll();
-					auth.requestMatchers( HttpMethod.GET, "/api/v1/todos/*")
+
+					auth.requestMatchers( "/api/v1/todos/*")
+							.authenticated();
+					auth.requestMatchers( HttpMethod.POST, "/api/v1/auth/*")
 							.permitAll();
 
-/*					auth.requestMatchers(  "/**")
-							.permitAll();*/
+					auth.requestMatchers(  "/**")
+							.hasAuthority("ADMIN");
 				})
 				.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
 				.httpBasic(Customizer.withDefaults())

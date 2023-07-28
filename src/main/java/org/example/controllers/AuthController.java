@@ -1,8 +1,9 @@
 package org.example.controllers;
 
-import org.example.dtos.SignInUserDto;
-import org.example.security.AppUser;
-import org.example.security.AuthorizedUserService;
+import jakarta.validation.Valid;
+import org.example.services.dtos.SignInUserDto;
+import org.example.persistence.models.AppUser;
+import org.example.services.AuthorizedUserService;
 import org.example.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +26,10 @@ public class AuthController {
 	@Autowired
 	AuthenticationManager authenticationManager;
 	@PostMapping({"", "/"})
-	public ResponseEntity<String> authenticate(@RequestBody SignInUserDto user) {
+	public ResponseEntity<String> authenticate(@Valid @RequestBody SignInUserDto user) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
 		);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		UserDetails appUser = service.loadUserByUsername(user.getUsername());
-		String token = tokenUtil.generateToken((AppUser) appUser);
-		return ResponseEntity.ok(token);
+		return ResponseEntity.ok(service.authenticateAndGetToken(user, authentication));
 	}
 }

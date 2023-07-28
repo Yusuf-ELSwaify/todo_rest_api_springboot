@@ -1,4 +1,4 @@
-package org.example.security;
+package org.example.persistence.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,6 +22,8 @@ public class AppUser implements UserDetails {
 	Date creationDate;
 	@ElementCollection(fetch = FetchType.EAGER)
 	private List<String> authorities = new ArrayList<>();
+	@OneToMany(mappedBy = "user")
+	List<Todo> todos = new ArrayList<>();
 	public AppUser(String username, String password) {
 		this.username = username;
 		this.password = password;
@@ -52,6 +54,14 @@ public class AppUser implements UserDetails {
 
 	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
+	}
+
+	public List<Todo> getTodos() {
+		return todos;
+	}
+
+	public void setTodos(List<Todo> todos) {
+		this.todos = todos;
 	}
 
 	public void setAuthorities(List<String> authorities) {
@@ -92,5 +102,9 @@ public class AppUser implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+	public boolean isAdmin() {
+		return this.authorities.stream()
+				.anyMatch(grantedAuthority -> grantedAuthority.equals("ADMIN"));
 	}
 }

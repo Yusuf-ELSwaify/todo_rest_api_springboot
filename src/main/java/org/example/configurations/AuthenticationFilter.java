@@ -1,13 +1,17 @@
-package org.example.security;
+package org.example.configurations;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.services.AuthorizedUserService;
 import org.example.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +33,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		String token = request.getHeader(TOKEN_HEADER);
 		SecurityContext securityContext = SecurityContextHolder.getContext();
 		if (token != null && securityContext.getAuthentication() == null) {
+			if (token.contains("Bearer "))
+				token = token.substring("Bearer ".length());
 			String username = tokenUtil.getUsernameFromToken(token);
 			if (username != null) {
 				UserDetails user = service.loadUserByUsername(username);
@@ -41,4 +47,5 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		}
 		filterChain.doFilter(request, response);
 	}
+
 }

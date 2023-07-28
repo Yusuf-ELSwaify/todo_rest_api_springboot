@@ -1,14 +1,19 @@
-package org.example.security;
+package org.example.services;
 
+import org.example.persistence.models.AppUser;
 import org.example.persistence.repositories.AuthorizedUserRepository;
+import org.example.services.dtos.SignInUserDto;
+import org.example.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,14 +22,17 @@ import java.util.List;
 public class AuthorizedUserService implements UserDetailsService {
 	@Autowired
 	AuthorizedUserRepository repository;
+	@Autowired
+	TokenUtil tokenUtil;
 	PasswordEncoder passwordEncoder() {
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 		//return new BCryptPasswordEncoder(20);
 	}
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		AppUser appUser = repository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username + "not found."));
-		return appUser;
+		return repository.findByUsername(username).orElseThrow(
+				() -> new UsernameNotFoundException(username + " not found.")
+		);
 	}
 	public void add(AppUser appUser) {
 		//appUser.setPassword(passwordEncoder().encode(appUser.getPassword()));
@@ -35,5 +43,19 @@ public class AuthorizedUserService implements UserDetailsService {
 	}
 	public long usersCount() {
 		return repository.count();
+	}
+
+	public AppUser getCurrentUser() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Object user = authentication.getPrincipal();
+		if (user instanceof AppUser)
+			return (AppUser) user;
+		return null;
+ 	}
+
+	public String authenticateAndGetToken(SignInUserDto user, Authentication authentication) {
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		UserDetails appUser = loadUserByUsername(user.getUsername());
+		return tokenUtil.generateToken((AppUser) appUser);
 	}
 }
