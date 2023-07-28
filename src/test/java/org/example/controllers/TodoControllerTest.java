@@ -1,42 +1,35 @@
-package org.example;
+package org.example.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.persistence.models.AppUser;
 import org.example.persistence.models.Todo;
 import org.example.services.TodoService;
+import org.example.services.dtos.TodoRequestDto;
+import org.example.services.dtos.TodoResponseDto;
+import org.example.utils.TokenUtil;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.mockito.BDDMockito.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.hamcrest.Matchers.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
-public class TodoControllerTest {
-	@Autowired
-	MockMvc mockMvc;
+
+public class TodoControllerTest extends AbstractControllerTest {
 	@MockBean
 	private TodoService todoService;
+
 	@Test
 	public void whenGetAllTodos_returnOk() throws Exception {
 		mockMvc.perform(
-						get("/api/v1/todos")
+				doGet("/api/v1/todos/")
 								.contentType(MediaType.APPLICATION_JSON)
 				).andExpect(MockMvcResultMatchers.status().isOk());
 
@@ -52,11 +45,12 @@ public class TodoControllerTest {
 		todo1.setName("name2");
 		todo1.setContent("content2");
 		List<Todo> data = Arrays.asList(todo1, todo2);
+		List<TodoResponseDto> todoResponseDtos = todoMapper.toTodoResponseDtos(data);
 
-		given(todoService.findAll()).willReturn(data);
+		given(todoService.findAll()).willReturn(todoResponseDtos);
 
 		mockMvc.perform(
-				get("/api/v1/todos")
+						doGet("/api/v1/todos/")
 						.contentType(MediaType.APPLICATION_JSON)
 				).andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(jsonPath("$", hasSize(2)))
@@ -66,21 +60,21 @@ public class TodoControllerTest {
 
 	@Test
 	public void whenPostTodo_thenCreateTodo() throws Exception{
-		Todo todo1 = new Todo();
-		todo1.setName("Title of todo");
-		todo1.setContent("Title of todo");
+		TodoRequestDto todoRequestDto = new TodoRequestDto("Title of todo", "Title of todo");
+		Todo todo1 = todoMapper.fromTodoRequestDto(todoRequestDto);
 
-		given(todoService.add(Mockito.any(Todo.class))).willReturn(todo1);
+		TodoResponseDto todoResponseDto = todoMapper.toTodoResponseDto(todo1);
+		given(todoService.add(Mockito.any(TodoRequestDto.class), Mockito.any(AppUser.class))).willReturn(todoResponseDto);
 
 		ObjectMapper mapper = new ObjectMapper();
 
 		mockMvc.perform(
-						post("/api/v1/todos/")
+						doPost("/api/v1/todos/")
 								.contentType(MediaType.APPLICATION_JSON)
-								.content(mapper.writeValueAsString(todo1))
+								.content(mapper.writeValueAsString(todoRequestDto))
 				)
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(jsonPath("$.name", is(todo1.getName())));
+				.andExpect(jsonPath("$.name", is(todoRequestDto.getName())));
 
 	}
 }

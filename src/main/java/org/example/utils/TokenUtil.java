@@ -18,8 +18,6 @@ import java.util.function.Function;
 
 @Component
 public class TokenUtil {
-	//private final String CLAIMS_SUBJECT = "sub";
-	//private final String CLAIMS_CREATED = "created";
 
 	@Value("${auth.expiration}")
 	private Long TOKEN_VALIDITY;
@@ -30,16 +28,12 @@ public class TokenUtil {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("ID", userDetails.getId());
 
-//		claims.put(CLAIMS_SUBJECT, userDetails.getUsername());
-//		claims.put(CLAIMS_CREATED, new Date());
-
 		return Jwts
 				.builder()
 				.setClaims(claims)
 				.setSubject(userDetails.getUsername())
 				.setIssuedAt(new Date())
 				.setExpiration(generateExpirationDate())
-				//.signWith(SignatureAlgorithm.HS256, TOKEN_SECRET)
 				.signWith(getSignInKey(), SignatureAlgorithm.HS256)
 				.compact();
 	}

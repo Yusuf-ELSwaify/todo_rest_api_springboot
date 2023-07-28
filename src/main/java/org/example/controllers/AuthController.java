@@ -30,6 +30,9 @@ public class AuthController {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
 		);
-		return ResponseEntity.ok(service.authenticateAndGetToken(user, authentication));
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		UserDetails appUser = service.loadUserByUsername(user.getUsername());
+		String token = tokenUtil.generateToken((AppUser) appUser);
+		return ResponseEntity.ok(token);
 	}
 }

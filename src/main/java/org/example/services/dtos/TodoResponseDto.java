@@ -10,17 +10,4 @@ public class TodoResponseDto {
 	private String name;
 	private String content;
 	private long timestamp;
-//	public TodoReponseDto(Todo todo) {
-//		setId(todo.getId());
-//		setName(todo.getName());
-//		setContent(todo.getContent());
-//		setTimestamp(todo.getTimestamp());
-//	}
-//	public TodoReponseDto fromTodo(Todo todo) {
-//		setId(todo.getId());
-//		setName(todo.getName());
-//		setContent(todo.getContent());
-//		setTimestamp(todo.getTimestamp());
-//		return this;
-//	}
 }

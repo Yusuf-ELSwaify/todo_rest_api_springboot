@@ -22,8 +22,6 @@ import java.util.List;
 public class AuthorizedUserService implements UserDetailsService {
 	@Autowired
 	AuthorizedUserRepository repository;
-	@Autowired
-	TokenUtil tokenUtil;
 	PasswordEncoder passwordEncoder() {
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 		//return new BCryptPasswordEncoder(20);
@@ -52,10 +50,4 @@ public class AuthorizedUserService implements UserDetailsService {
 			return (AppUser) user;
 		return null;
  	}
-
-	public String authenticateAndGetToken(SignInUserDto user, Authentication authentication) {
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		UserDetails appUser = loadUserByUsername(user.getUsername());
-		return tokenUtil.generateToken((AppUser) appUser);
-	}
 }

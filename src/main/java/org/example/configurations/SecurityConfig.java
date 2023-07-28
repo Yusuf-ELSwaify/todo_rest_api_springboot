@@ -19,25 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig{
 	@Autowired
 	private AuthenticationFilter authenticationFilter;
-/*	@Bean
-	PasswordEncoder passwordEncoder() {
-		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-		//return new BCryptPasswordEncoder(20);
-	}*/
-//	@Bean
-//	public UserDetailsService userDetailsService() {
-//		UserDetails userDetails = User.builder()
-//				.username("yusuf")
-//				.password("{noop}pass")
-//				.roles("USER")
-//				.build();
-//		UserDetails userDetails2 = User.builder()
-//				.username("yusuf2")
-//				.password("{noop}pass2")
-//				.roles("USER2")
-//				.build();
-//		return new InMemoryUserDetailsManager(userDetails, userDetails2);
-//	}
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 

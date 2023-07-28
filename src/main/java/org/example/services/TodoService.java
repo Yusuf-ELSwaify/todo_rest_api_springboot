@@ -20,45 +20,40 @@ public class TodoService {
 	@Autowired
 	TodoRepository todoRepository;
 	@Autowired
-	AuthorizedUserService authorizedUserService;
-	@Autowired
 	TodoMapper todoMapper;
 
 	public List<TodoResponseDto> findAll() {
-		AppUser appUser = authorizedUserService.getCurrentUser();
-		List<Todo> todos = null;
-		if (appUser.isAdmin())
-			todos =  todoRepository.findAll();
-		else
-			todos =  todoRepository.findAllByUser(appUser);
-		return todoMapper.toTodoResponseDtos(todos);
-		/*return todos.stream()
-				.map(TodoResponseDto::new)
-				.toList();*/
+		return todoMapper.toTodoResponseDtos(todoRepository.findAll());
+	}
+	public List<TodoResponseDto> findAllByUser(AppUser appUser) {
+		return todoMapper.toTodoResponseDtos(todoRepository.findAllByUser(appUser));
 	}
 
-	public TodoResponseDto find(int id) {
+	public TodoResponseDto findById(int id) {
 		try {
-			AppUser appUser = authorizedUserService.getCurrentUser();
-			Todo todo = appUser.isAdmin() ? todoRepository.findById(id).get()
-						: todoRepository.findByIdAndUser(id, appUser).get();
+			Todo todo = todoRepository.findById(id).get();
+			return todoMapper.toTodoResponseDto(todo);
+		} catch (NoSuchElementException ex) {
+			throw new ElementNotFoundException(String.format("the element with id [%d] not found.", id));
+		}
+	}
+	public TodoResponseDto findByIdAndUser(int id, AppUser appUser) {
+		try {
+			Todo todo = todoRepository.findByIdAndUser(id, appUser).get();
 			return todoMapper.toTodoResponseDto(todo);
 		} catch (NoSuchElementException ex) {
 			throw new ElementNotFoundException(String.format("the element with id [%d] not found or you are not have the authority to get it.", id));
 		}
 	}
-	public TodoResponseDto add(TodoRequestDto todoRequestDto) {
+	public TodoResponseDto add(TodoRequestDto todoRequestDto, AppUser appUser) {
 		Todo todo = todoRequestDto.toTodo();
-		AppUser appUser = authorizedUserService.getCurrentUser();
 		int count = todoRepository.countAllByNameAndUser(todo.getName(), appUser);
 		if (count != 0)
 			throw new AlreadyExistsException(String.format("The todo [%s] is already written before [%d] times.", todo.getName(), count));
 		todo.setUser(appUser);
 		return todoMapper.toTodoResponseDto(todoRepository.save(todo));
 	}
-	public void delete(int id) {
-		AppUser appUser = authorizedUserService.getCurrentUser();
-
+	public void delete(int id, AppUser appUser) {
 		Todo todo = todoRepository.findById(id).orElseThrow(
 				() -> new ElementNotFoundException(String.format("No element found with id [%d] in our Database", id))
 		);
