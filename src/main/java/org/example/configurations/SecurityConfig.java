@@ -29,6 +29,11 @@ public class SecurityConfig{
 					auth.requestMatchers( HttpMethod.POST, "/api/v1/auth/*")
 							.permitAll();
 
+					auth.requestMatchers(  HttpMethod.GET, "/swagger-ui/**")
+							.permitAll();
+					auth.requestMatchers(  HttpMethod.GET, "/v3/api-docs/**")
+							.permitAll();
+
 					auth.requestMatchers(  "/**")
 							.hasAuthority("ADMIN");
 				})

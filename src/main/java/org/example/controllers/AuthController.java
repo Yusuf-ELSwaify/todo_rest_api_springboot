@@ -25,7 +25,7 @@ public class AuthController {
 	AuthorizedUserService service;
 	@Autowired
 	AuthenticationManager authenticationManager;
-	@PostMapping({"", "/"})
+	@PostMapping({"/"})
 	public ResponseEntity<String> authenticate(@Valid @RequestBody SignInUserDto user) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
